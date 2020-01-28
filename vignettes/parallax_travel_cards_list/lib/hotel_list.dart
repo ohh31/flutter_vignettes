@@ -13,14 +13,16 @@ class HotelList extends StatefulWidget {
   _HotelListViewState createState() => _HotelListViewState();
 }
 
-class _HotelListViewState extends State<HotelList> with SingleTickerProviderStateMixin {
+class _HotelListViewState extends State<HotelList>
+    with SingleTickerProviderStateMixin {
   AnimationController _anim;
 
   List<Hotel> _oldHotels;
 
   @override
   void initState() {
-    _anim = AnimationController(vsync: this, duration: Duration(milliseconds: 700));
+    _anim =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 700));
     _anim.addListener(() => setState(() {}));
     super.initState();
   }
@@ -35,7 +37,8 @@ class _HotelListViewState extends State<HotelList> with SingleTickerProviderStat
     return Opacity(
       opacity: _anim.value,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: Styles.hzScreenPadding * 1.5, vertical: 10),
+        padding: EdgeInsets.symmetric(
+            horizontal: Styles.hzScreenPadding * 1.5, vertical: 10),
         child: Container(
           width: 400,
           height: size.height * .25,
@@ -47,7 +50,9 @@ class _HotelListViewState extends State<HotelList> with SingleTickerProviderStat
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[for (Hotel hotel in widget.hotels) _buildHotelData(hotel)],
+                  children: <Widget>[
+                    for (Hotel hotel in widget.hotels) _buildHotelData(hotel)
+                  ],
                 ),
               )
             ],
@@ -57,6 +62,7 @@ class _HotelListViewState extends State<HotelList> with SingleTickerProviderStat
     );
   }
 
+//호텔 데이터 추가
   Widget _buildHotelData(Hotel hotel) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -83,6 +89,7 @@ class _HotelListViewState extends State<HotelList> with SingleTickerProviderStat
     );
   }
 
+//호텔 별점 추가
   Widget _buildStars(int count) {
     List<Widget> stars = [];
     for (int i = 0; i < count; i++) {

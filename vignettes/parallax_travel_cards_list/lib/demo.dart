@@ -43,10 +43,12 @@ class _TravelCardDemoState extends State<TravelCardDemo> {
                 maxLines: 2,
               ),
             ),
+            //호텔 카드
             TravelCardList(
               cities: _cityList,
               onCityChange: _handleCityChange,
             ),
+            //호텔 내역 리스트
             HotelList(_currentCity.hotels),
             Expanded(child: SizedBox()),
           ],
@@ -55,12 +57,14 @@ class _TravelCardDemoState extends State<TravelCardDemo> {
     );
   }
 
+  //스크롤 후 도시 설정
   void _handleCityChange(City city) {
     setState(() {
       this._currentCity = city;
     });
   }
 
+  //앱 상단바
   Widget _buildAppBar() {
     return AppBar(
       elevation: 0.0,
@@ -69,7 +73,8 @@ class _TravelCardDemoState extends State<TravelCardDemo> {
       brightness: Brightness.light,
       actions: <Widget>[
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: Styles.hzScreenPadding),
+          padding:
+              const EdgeInsets.symmetric(horizontal: Styles.hzScreenPadding),
           child: Icon(Icons.search, color: Colors.black),
         )
       ],

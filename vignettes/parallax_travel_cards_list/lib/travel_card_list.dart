@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:parallax_travel_cards_list/rotation_3d.dart';
+
 import 'demo_data.dart';
-import 'rotation_3d.dart';
 import 'travel_card_renderer.dart';
 
 class TravelCardList extends StatefulWidget {
   final List<City> cities;
   final Function onCityChange;
 
-  const TravelCardList({Key key, this.cities, @required this.onCityChange}) : super(key: key);
+  const TravelCardList({Key key, this.cities, @required this.onCityChange})
+      : super(key: key);
 
   @override
   TravelCardListState createState() => TravelCardListState();
 }
 
-class TravelCardListState extends State<TravelCardList> with SingleTickerProviderStateMixin {
+class TravelCardListState extends State<TravelCardList>
+    with SingleTickerProviderStateMixin {
   final double _maxRotation = 20;
 
   PageController _pageController;
@@ -35,7 +38,8 @@ class TravelCardListState extends State<TravelCardList> with SingleTickerProvide
     _cardHeight = (size.height * .48).clamp(300.0, 400.0);
     _cardWidth = _cardHeight * .8;
     //Calculate the viewPort fraction for this aspect ratio, since PageController does not accept pixel based size values
-    _pageController = PageController(initialPage: 1, viewportFraction: _cardWidth / size.width);
+    _pageController = PageController(
+        initialPage: 1, viewportFraction: _cardWidth / size.width);
 
     //Create our main list
     Widget listContent = Container(
@@ -45,6 +49,7 @@ class TravelCardListState extends State<TravelCardList> with SingleTickerProvide
       child: PageView.builder(
         //Use bounce-style scroll physics, feels better with this demo
         physics: BouncingScrollPhysics(),
+
         controller: _pageController,
         itemCount: 8,
         scrollDirection: Axis.horizontal,
@@ -55,23 +60,27 @@ class TravelCardListState extends State<TravelCardList> with SingleTickerProvide
     //Wrap our list content in a Listener to detect PointerUp events, and a NotificationListener to detect ScrollStart and ScrollUpdate
     //We have to use both, because NotificationListener does not inform us when the user has lifted their finger.
     //We can not use GestureDetector like we normally would, ListView suppresses it while scrolling.
+    //스크롤 여부 확인
     return Listener(
       onPointerUp: _handlePointerUp,
       child: NotificationListener(
         onNotification: _handleScrollNotifications,
-        child: listContent,
+        child: listContent, //카드 컨텐츠
       ),
     );
   }
 
   //Create a renderer for each list item
+  //각각의 호텔 카드 설정
   Widget _buildItemRenderer(int itemIndex) {
     return Container(
       //Vertically pad all the non-selected items, to make them smaller. AnimatedPadding widget handles the animation.
       child: Rotation3d(
+        //스크롤 시 카드 좌우로 움직임 변환
         rotationY: _normalizedOffset * _maxRotation,
         //Create the actual content renderer for our list
         child: TravelCardRenderer(
+          //호텔 카드 외관 설정
           //Pass in the offset, renderer can update it's own view from there
           _normalizedOffset,
           //Pass in city path for the image asset links
@@ -87,16 +96,20 @@ class TravelCardListState extends State<TravelCardList> with SingleTickerProvide
   bool _handleScrollNotifications(Notification notification) {
     //Scroll Update, add to our current offset, but clamp to -1 and 1
     if (notification is ScrollUpdateNotification) {
+      //스크롤 포지션이 바뀌었을 때
       if (_isScrolling) {
+        //스크롤 중일 때
         double dx = notification.metrics.pixels - _prevScrollX;
-        double scrollFactor = .01;
+        double scrollFactor = 1; //좌우로 스크롤되는 정도
         double newOffset = (_normalizedOffset + dx * scrollFactor);
-        _setOffset(newOffset.clamp(-1.0, 1.0));
+        _setOffset(newOffset.clamp(-1.0, 1.0)); // 좌우로 움직이는 정도
       }
+      //스크롤이 끝났을 때
       _prevScrollX = notification.metrics.pixels;
       //Calculate the index closest to middle
       //_focusedIndex = (_prevScrollX / (_itemWidth + _listItemPadding)).round();
-      widget.onCityChange(widget.cities.elementAt(_pageController.page.round() % widget.cities.length));
+      widget.onCityChange(widget.cities.elementAt(
+          _pageController.page.round() % widget.cities.length)); //스크롤 후 city 설정
     }
     //Scroll Start
     else if (notification is ScrollStartNotification) {
@@ -131,11 +144,13 @@ class TravelCardListState extends State<TravelCardList> with SingleTickerProvide
     int tweenTime = 1000;
     if (_tweenController == null) {
       //Create Controller, which starts/stops the tween, and rebuilds this widget while it's running
-      _tweenController = AnimationController(vsync: this, duration: Duration(milliseconds: tweenTime));
+      _tweenController = AnimationController(
+          vsync: this, duration: Duration(milliseconds: tweenTime));
       //Create Tween, which defines our begin + end values
       _tween = Tween<double>(begin: -1, end: 0);
       //Create Animation, which allows us to access the current tween value and the onUpdate() callback.
-      _tweenAnim = _tween.animate(new CurvedAnimation(parent: _tweenController, curve: Curves.elasticOut))
+      _tweenAnim = _tween.animate(new CurvedAnimation(
+          parent: _tweenController, curve: Curves.elasticOut))
         //Set our offset each time the tween fires, triggering a rebuild
         ..addListener(() {
           _setOffset(_tweenAnim.value);
